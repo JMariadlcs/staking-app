@@ -15,3 +15,4 @@ yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomic
 
 ## Resources
 - [OpenZeppeling github](https://github.com/OpenZeppelin/openzeppelin-contracts)
+- [Solidity by example](https://solidity-by-example.org)

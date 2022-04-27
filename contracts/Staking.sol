@@ -32,8 +32,10 @@ contract Staking {
     }
     
     /**
-    @notice do we allow any tokens? -> no | if we allo any token -> use Chainlink stuff to convert prices between tokens
-    or we allow just specific token? -> add token address
+    @notice 
+    - do we allow any tokens? -> no | if we allo any token -> use Chainlink stuff to convert prices between tokens
+    - or we allow just specific token? -> add token address
+    - user will need to call approve() for the ERC20 token before calling staking otherwise .transferFrom() will fail
     @dev 
     - keep track how much user has staked
     - keep track of how much tokens we have total
@@ -44,9 +46,21 @@ contract Staking {
         s_totalSupply = s_totalSupply + amount;
         // emit event
         bool success = s_stakingToken.transferFrom(msg.sender, address(this), amount); //.transferFrom from IERC20 OpenZeppeling
-        // require(success, "Failed transaction"); // substituted by customed erros
+        // require(success, "Failed transaction"); // substituted by customed erros (because require "" is very expensive)
         if(!success) {
             revert Staking__TransferFailed();
         }
+    }
+
+    /**
+    @notice 
+    - user wont need to approve before withdraw() because now .transfer() can be executed by the contract 
+    because it actually owns the tokens in that moment (before withdrawing)
+    */
+    function withdraw(uint256 amount) external {
+         s_balances[msg.sender] =  s_balances[msg.sender] - amount;
+         s_totalSupply = s_totalSupply - amount;
+
+         bool succeess = s_stakingToken.transfer(msg.sender, amount);
     }
 }
