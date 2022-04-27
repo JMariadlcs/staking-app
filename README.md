@@ -1,6 +1,6 @@
 # STAKING-APP
 
-## Requirements for creating similar project from scratch
+## Requirements for creating similar projects from scratch
 - Start hardhat project:
 ```bash
 npm init -y
