@@ -1,5 +1,13 @@
 # STAKING-APP
 
+This is a Staking App from a Chainlink Hackaton Spring 2022 workshop which is implemented by using Solidity and Hardhat.
+
+## Objetives
+Implement a Staking App with the following functionalities: 
+1. stake: Lock tokens into our Smart Contract ✅
+2. withdraw: (unstake) unlock tokens and pull out of the Smart Contract ✅
+3. claimReward: users get their reward tokens (earned by staking) ✅
+
 ## Requirements for creating similar projects from scratch
 - Start hardhat project:
 ```bash
