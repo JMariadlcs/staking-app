@@ -7,7 +7,7 @@
 //      What's a good reward mechanism?
 //      What's good reward maths?
 
-// PSDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.7;
 
@@ -22,22 +22,60 @@ contract Staking {
     IERC20 public s_stakingToken; // 's_' indicating its going to be 'storage' (expensirve to read and write)
     // || IERC20: OpenZeppeling interface for ERC20 tokens
 
-    // user address => staking balance
+    // user address => staking balance | how much each address has been paid
     mapping(address => uint256) public s_balances;
+    mapping(address => uint256) public s_userRewardPerTokenPaid;
+     mapping(address => uint256) public s_rewards;
 
-    // track total supply of tokens in the Smart Contract
+    // track total supply of tokens in the Smart Contract || calculation of reward/tokenstored || staking snapshots
+    uint256 public constant REWARD_RATE = 100;
     uint256 public s_totalSupply;
+    uint256 public s_rewardPerTokenStored;
+    uint256 public s_lastUpdatedTime; 
 
     // modifier for updateRewards
     modifier updateRewards(address account) {
         // how much reward per token?
         // last timestamp
         // 12 -1, user earns x tokens
+        s_rewardPerTokenStored = rewardPerToken();
+        s_lastUpdatedTime = block.timestamp; // update snapshot
+        s_rewards[account] = earned(account);
+        s_userRewardPerTokenPaid[account] = s_rewardPerTokenStored;
         _;
     }
 
     constructor(address stakingToken) {
         s_stakingToken = IERC20(stakingToken);
+    }
+
+    /**
+    * @dev 
+    * - Calculate total earned tokens of a user
+    * - Need to take into account how much they have been paid already
+    */
+    function earned(address account) public view returns(uint256) {
+        uint256 currentBalance = s_balances[account];
+        uint256 amountPaid = s_userRewardPerTokenPaid[account]; // how much user has already been paid
+        uint256 currentRewardPerToken = rewardPerToken();
+        uint256 pastRewards = s_rewards[account];
+
+        uint256 total_earned = ((currentBalance * (currentRewardPerToken - amountPaid)) / 1e18) + pastRewards;
+        return total_earned;
+    }
+
+    /**
+    * @dev 
+    * - Functionality: calculate the math for rewardPerToken staked
+    * - Based on how long it's been during this most recent snapshot
+    * - Formula comes from math mechanism defined in THIS specific DEFI APP
+    */
+    function rewardPerToken() public view returns(uint256) {
+        if (s_totalSupply == 0) { // case: nothing staked
+            return s_rewardPerTokenStored;
+        }
+
+        return s_rewardPerTokenStored + ((block.timestamp - s_lastUpdatedTime) * REWARD_RATE * 1e18 / s_totalSupply); //*1e18 because being in wei
     }
     
    /**
@@ -105,7 +143,7 @@ contract Staking {
     *   between seconds 1 and 5, person 1 got 500 tokens
     *   at second 6 on, person 1 gets 50 tokens now (100 reward tokens in total divided between num of stakers (2))
     *
-    *                   ---EXAMPLE---
+    *                                              ---EXAMPLE---
     * Time = 0
     * Person A: 80 staked
     * Person B: 20 staked
