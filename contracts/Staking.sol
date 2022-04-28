@@ -25,7 +25,7 @@ contract Staking {
     // || IERC20: OpenZeppeling interface for ERC20 tokens
     IERC20 public s_rewardToken; // same but token used for rewards
 
-    // user address => staking balance | how much each address has been paid | how much rewards each address has
+    // user address => staking balance || how much each address has been paid || how much rewards each address has
     mapping(address => uint256) public s_balances;
     mapping(address => uint256) public s_userRewardPerTokenPaid;
     mapping(address => uint256) public s_rewards;
