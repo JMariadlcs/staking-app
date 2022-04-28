@@ -16,16 +16,19 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // Custom Errors
 error Staking__TransferFailed();
 error Withdraw__TransferFailed();
+error Claim__TransferFailed();
+error Staking__NeedsMoreThanZero();
 
 contract Staking {
 
     IERC20 public s_stakingToken; // 's_' indicating its going to be 'storage' (expensirve to read and write)
     // || IERC20: OpenZeppeling interface for ERC20 tokens
+    IERC20 public s_rewardToken; // same but token used for rewards
 
-    // user address => staking balance | how much each address has been paid
+    // user address => staking balance | how much each address has been paid | how much rewards each address has
     mapping(address => uint256) public s_balances;
     mapping(address => uint256) public s_userRewardPerTokenPaid;
-     mapping(address => uint256) public s_rewards;
+    mapping(address => uint256) public s_rewards;
 
     // track total supply of tokens in the Smart Contract || calculation of reward/tokenstored || staking snapshots
     uint256 public constant REWARD_RATE = 100;
@@ -34,7 +37,7 @@ contract Staking {
     uint256 public s_lastUpdatedTime; 
 
     // modifier for updateRewards
-    modifier updateRewards(address account) {
+    modifier updateReward(address account) {
         // how much reward per token?
         // last timestamp
         // 12 -1, user earns x tokens
@@ -45,8 +48,17 @@ contract Staking {
         _;
     }
 
-    constructor(address stakingToken) {
+    // modifier to check if balances are > 0
+    modifier moreThanZero(uint256 amount) {
+        if(amount == 0){
+            revert Staking__NeedsMoreThanZero();
+        }
+        _;
+    }
+
+    constructor(address stakingToken, address rewardToken) {
         s_stakingToken = IERC20(stakingToken);
+        s_rewardToken = IERC20(rewardToken);
     }
 
     /**
@@ -94,7 +106,7 @@ contract Staking {
     * @param
     * - external: cheaper than public (we are not caling staking inside this contract)
     *//** */
-    function stake(uint256 amount) external {
+    function stake(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
         // IMPORTANT: update balances before .transferFrom() to avoid -> ¡¡REENTRANCY ATTACKS!!
         s_balances[msg.sender] =  s_balances[msg.sender] + amount;
         s_totalSupply = s_totalSupply + amount;
@@ -113,7 +125,7 @@ contract Staking {
     * - user wont need to approve before withdraw() because now .transfer() can be executed by the contract 
     * because it actually owns the tokens in that moment (before withdrawing)
     */
-    function withdraw(uint256 amount) external {
+    function withdraw(uint256 amount) external updateReward(msg.sender) moreThanZero(amount) {
          s_balances[msg.sender] =  s_balances[msg.sender] - amount;
          s_totalSupply = s_totalSupply - amount;
          //emit event
@@ -163,7 +175,12 @@ contract Staking {
     * Person B: Staked: 20, Earned: 40 + (stakeB/totalStaked)*100 -> (20/200)*100: 10 , Withdrawn: 0
     * Person C: Staked: 100, Earned: (stakedC/totalStaked) -> (100/200)*100: 50, Withdrawn: 0
     */
-    function claimReward() external {
+    function claimReward() external updateReward(msg.sender) { // first it does: updateReward
+        uint256 reward = s_rewards[msg.sender]; // we get the rewards of the address to transfer them
+        bool success = s_rewardToken.transfer(msg.sender, reward);
 
+        if(!success) {
+            revert Claim__TransferFailed();
+        }
     }
 }
