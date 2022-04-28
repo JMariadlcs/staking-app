@@ -14,6 +14,7 @@ yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomic
 ```
 
 ## Resources
-- [OpenZeppeling github](https://github.com/OpenZeppelin/openzeppelin-contracts)
-- [Solidity by example](https://solidity-by-example.org)
-- [defi-minimal repo](https://github.com/smartcontractkit/defi-minimal): a repo with lot of useful examples
+- [OpenZeppeling github](https://github.com/OpenZeppelin/openzeppelin-contracts): OpenZeppeling github
+- [Solidity by example](https://solidity-by-example.org): Solidity examples
+- [defi-minimal repo](https://github.com/smartcontractkit/defi-minimal): a repo with a lot of useful DEFI examples
+- [hardhat-starter-kit](https://github.com/smartcontractkit/hardhat-starter-kit)

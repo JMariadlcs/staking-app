@@ -111,7 +111,6 @@ contract Staking {
         s_balances[msg.sender] =  s_balances[msg.sender] + amount;
         s_totalSupply = s_totalSupply + amount;
         // emit event
-
         bool success = s_stakingToken.transferFrom(msg.sender, address(this), amount); //.transferFrom from IERC20 OpenZeppeling
         
         // require(success, "Failed transaction"); // substituted by customed erros (because require "" is very expensive)
