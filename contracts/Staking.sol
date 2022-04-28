@@ -97,11 +97,6 @@ contract Staking {
     * - Disperse them to all the token stakers
     *
     * - 100 reward tokens / second (in total) -> THE MORE PEOPLE STAKE: THE LESS REWARDS GENERATED FOR EACH
-    *  staked: 50 staked tokens, 20 staked tokens, 30 staked tokens
-    *  rewards: 50 reward tokens, 20 reward tokens, 30 reward tokens
-    *
-    *  staked: 100, 50, 20, 30 (total = 200)
-    *  rewards: 50, 25, 10, 15
     *
     * - In 5 seconds, 1 person had 100 token staked = reward 500 tokens
     * - In second 6 (1 more from second 5), 2 persons have 100 tokens staked each:
@@ -109,6 +104,26 @@ contract Staking {
     *     Person 2: 50 reward
     *   between seconds 1 and 5, person 1 got 500 tokens
     *   at second 6 on, person 1 gets 50 tokens now (100 reward tokens in total divided between num of stakers (2))
+    *
+    *                   ---EXAMPLE---
+    * Time = 0
+    * Person A: 80 staked
+    * Person B: 20 staked
+    *
+    * Time = 1
+    * Person A: Staked: 80, Earned: 80, Withdrawn: 0
+    * Person B: Staked: 20, Earned: 20, Withdrawn: 0
+    *
+    * Time = 2
+    * Person A: Staked: 80, Earned: 160, Withdrawn: 0
+    * Person B: Staked: 20, Earned: 40, Withdrawn: 0
+    *
+    * NEW PERSON ENTERS! -> stake: 100 | totalStaked: 200
+    *
+    * Time = 3
+    * Person A: Staked: 80, Earned: 160 + (stakeA/totalStaked)*100 -> (80/200)*100: 40 , Withdrawn: 0
+    * Person B: Staked: 20, Earned: 40 + (stakeB/totalStaked)*100 -> (20/200)*100: 10 , Withdrawn: 0
+    * Person C: Staked: 100, Earned: (stakedC/totalStaked) -> (100/200)*100: 50, Withdrawn: 0
     */
     function claimReward() external {
 
