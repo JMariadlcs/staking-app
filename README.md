@@ -13,6 +13,19 @@ npx hardhat
 yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomiclabs/hardhat-etherscan @nomiclabs/hardhat-waffle chai ethereum-waffle hardhat hardhat-contract-sizer hardhat-deploy hardhat-gas-reporter prettier prettier-plugin-solidity solhint solidity-coverage dotenv
 ```
 
+- Add .gitignore file containing:
+```bash
+node_modules
+.env
+coverage
+coverage.json
+typechain
+
+#Hardhat files
+cache
+artifacts
+```
+
 ## Resources
 - [DeFi Staking App: Code Along](https://www.youtube.com/watch?v=-48_hdo9_gg&t=4447s): Chainlink Hackathon Spring 2022 workshop video
 - [OpenZeppeling github](https://github.com/OpenZeppelin/openzeppelin-contracts): OpenZeppeling github
