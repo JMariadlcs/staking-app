@@ -28,6 +28,14 @@ contract Staking {
     // track total supply of tokens in the Smart Contract
     uint256 public s_totalSupply;
 
+    // modifier for updateRewards
+    modifier updateRewards(address account) {
+        // how much reward per token?
+        // last timestamp
+        // 12 -1, user earns x tokens
+        _;
+    }
+
     constructor(address stakingToken) {
         s_stakingToken = IERC20(stakingToken);
     }
@@ -94,6 +102,13 @@ contract Staking {
     *
     *  staked: 100, 50, 20, 30 (total = 200)
     *  rewards: 50, 25, 10, 15
+    *
+    * - In 5 seconds, 1 person had 100 token staked = reward 500 tokens
+    * - In second 6 (1 more from second 5), 2 persons have 100 tokens staked each:
+    *     Person 1: 550 reward
+    *     Person 2: 50 reward
+    *   between seconds 1 and 5, person 1 got 500 tokens
+    *   at second 6 on, person 1 gets 50 tokens now (100 reward tokens in total divided between num of stakers (2))
     */
     function claimReward() external {
 
